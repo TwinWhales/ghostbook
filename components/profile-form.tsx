@@ -19,7 +19,7 @@ const initialState: ActionState = {
 }
 
 export function ProfileForm({ profile, allTags }: ProfileFormProps) {
-  const [state, formAction, isPending] = useActionState(updateProfile, initialState)
+  const [state, formAction, isPending] = useActionState<ActionState, FormData>(updateProfile, initialState)
   const router = useRouter()
 
   useEffect(() => {

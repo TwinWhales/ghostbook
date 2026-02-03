@@ -46,7 +46,7 @@ export async function updateProfile(prevState: ActionState, formData: FormData):
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
-    return { error: 'Unauthorized', success: false }
+    return { error: 'Unauthorized' }
   }
 
   const company_name = formData.get('company_name') as string
@@ -60,9 +60,9 @@ export async function updateProfile(prevState: ActionState, formData: FormData):
   const cohort = formData.get('cohort') as string
 
   // Validation
-  if (company_name && company_name.length > 50) return { error: '회사명은 50자를 초과할 수 없습니다.', success: false }
-  if (job_title && job_title.length > 50) return { error: '직무명은 50자를 초과할 수 없습니다.', success: false }
-  if (bio && bio.length > 300) return { error: '자기소개는 300자를 초과할 수 없습니다.', success: false }
+  if (company_name && company_name.length > 50) return { error: '회사명은 50자를 초과할 수 없습니다.' }
+  if (job_title && job_title.length > 50) return { error: '직무명은 50자를 초과할 수 없습니다.' }
+  if (bio && bio.length > 300) return { error: '자기소개는 300자를 초과할 수 없습니다.' }
   
   // URL Validation (Simple "starts with http" check to prevent javascript: or malicious schemes)
   const validateUrl = (url: string) => {
@@ -74,14 +74,14 @@ export async function updateProfile(prevState: ActionState, formData: FormData):
   }
 
   const linkedinError = validateUrl(linkedin_url)
-  if (linkedinError) return { error: `LinkedIn ${linkedinError}`, success: false }
+  if (linkedinError) return { error: `LinkedIn ${linkedinError}` }
   
   const blogError = validateUrl(blog_url)
-  if (blogError) return { error: `블로그 ${blogError}`, success: false }
+  if (blogError) return { error: `블로그 ${blogError}` }
 
   // OB/YB Cohort Validation
-  if (ob_yb && !['OB', 'YB'].includes(ob_yb)) return { error: 'OB 또는 YB만 선택 가능합니다.', success: false }
-  if (cohort && isNaN(parseInt(cohort))) return { error: '기수는 숫자여야 합니다.', success: false }
+  if (ob_yb && !['OB', 'YB'].includes(ob_yb)) return { error: 'OB 또는 YB만 선택 가능합니다.' }
+  if (cohort && isNaN(parseInt(cohort))) return { error: '기수는 숫자여야 합니다.' }
 
   const tags = formData.getAll('tags') as string[] 
 
@@ -101,7 +101,7 @@ export async function updateProfile(prevState: ActionState, formData: FormData):
     .eq('id', user.id)
 
   if (updateError) {
-    return { error: updateError.message, success: false }
+    return { error: updateError.message }
   }
 
   // 2. Update Tags (Delete all and re-insert? Or diff?)
@@ -125,7 +125,7 @@ export async function updateProfile(prevState: ActionState, formData: FormData):
       .select('tag_id, tag_name')
       .in('tag_name', tags)
     
-    if (tagFetchError) return { error: 'Failed to fetch tags', success: false }
+    if (tagFetchError) return { error: 'Failed to fetch tags' }
     
     const validTagIds = tagObjects.map(t => t.tag_id)
 
@@ -139,7 +139,7 @@ export async function updateProfile(prevState: ActionState, formData: FormData):
         tag_id: tid
       }))
       const { error: insertError } = await supabase.from('tb_alumni_tags').insert(inserts)
-      if (insertError) return { error: 'Failed to update tags', success: false }
+      if (insertError) return { error: 'Failed to update tags' }
     }
   } else {
     // If no tags selected, just delete existing
@@ -148,5 +148,5 @@ export async function updateProfile(prevState: ActionState, formData: FormData):
 
   revalidatePath('/mypage')
   revalidatePath('/') // Main list needs update too
-  return { success: true, error: undefined }
+  return { success: true }
 }
