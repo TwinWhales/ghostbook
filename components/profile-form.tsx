@@ -1,6 +1,6 @@
 'use client'
 
-import { updateProfile } from '@/app/actions/profile'
+import { updateProfile, ActionState } from '@/app/actions/profile'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,9 +13,9 @@ interface ProfileFormProps {
   allTags: string[]
 }
 
-const initialState = {
-  error: '',
-  success: false
+const initialState: ActionState = {
+  error: undefined,
+  success: undefined
 }
 
 export function ProfileForm({ profile, allTags }: ProfileFormProps) {
