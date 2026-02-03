@@ -10,7 +10,7 @@ export async function loginWithGoogle() {
     options: {
       // Hardcode to localhost for development.
       // In production, we should use `process.env.NEXT_PUBLIC_SITE_URL` if available.
-      redirectTo: `${process.env.NODE_ENV === 'production' ? 'https://ghostbook-app.vercel.app' : 'http://localhost:3000'}/auth/callback`,
+      redirectTo: `${process.env.NODE_ENV === 'production' ? 'https://ghostbook-sigma.vercel.app' : 'http://localhost:3000'}/auth/callback`,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
