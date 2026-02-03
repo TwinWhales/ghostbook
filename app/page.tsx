@@ -8,6 +8,8 @@ import { AlumniDetailWrapper } from '@/components/alumni-detail-wrapper'
 
 import { createClient } from '@/lib/supabase'
 import LandingPage from '@/components/landing-page'
+import { AnimatedHeader } from '@/components/animated-header'
+import { AlumniCarousel } from '@/components/alumni-carousel'
 
 export const dynamic = 'force-dynamic'
 
@@ -72,10 +74,10 @@ export default async function Home({
 
       {/* Header */}
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center px-4">
+        <div className="container mx-auto flex h-14 items-center px-4">
           <div className="mr-4 hidden md:flex">
             <Link href="/" className="mr-6 flex items-center space-x-2">
-              <span className="hidden font-bold sm:inline-block">GHOSTd</span>
+              <span className="hidden font-bold sm:inline-block">GHOST Archive</span>
             </Link>
           </div>
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
@@ -109,7 +111,7 @@ export default async function Home({
         </div>
         
         {/* Mobile Tag Filter (Horizontal Scroll) */}
-        <div className="container px-4 py-2 overflow-x-auto whitespace-nowrap scrollbar-hide border-b md:border-none">
+        <div className="container mx-auto px-4 py-2 overflow-x-auto whitespace-nowrap scrollbar-hide border-b md:border-none">
           <div className="flex space-x-2">
              <Link href="/">
                <span className={`px-3 py-1 text-sm rounded-full cursor-pointer transition-colors ${!tag ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
@@ -126,48 +128,24 @@ export default async function Home({
           </div>
         </div>
       </header>
-
-      <main className="container px-4 py-6 md:py-8">
-        <h2 className="text-xl font-semibold mb-4">
-          {tag ? `#${tag}` : '전체 졸업생'} 
-          <span className="text-muted-foreground ml-2 text-sm font-normal">({alumniList.length})</span>
-        </h2>
-
-        {alumniList.length === 0 ? (
-           <div className="text-center py-20 text-muted-foreground">
-             검색 결과가 없습니다.
-           </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {alumniList.map((alumni) => (
-              <Link key={alumni.id} href={`/?q=${search}&tag=${tag}&id=${alumni.id}`} scroll={false}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-                  <CardHeader className="p-4 pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{alumni.name}</CardTitle>
-                        <CardDescription>{alumni.cohort}기 / {alumni.student_id}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-2 space-y-2">
-                    <div className="text-sm font-medium">
-                      {alumni.company_name || '소속 없음'} 
-                      {alumni.job_title && <span className="text-muted-foreground font-normal"> | {alumni.job_title}</span>}
-                    </div>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {alumni.tags.map(t => (
-                        <span key={t} className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded">
-                          #{t}
-                        </span>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
+      
+      <main className="container mx-auto px-4 py-6 md:py-8 overflow-hidden">
+        <AnimatedHeader />
+        
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <span className="w-2 h-8 bg-primary rounded-sm inline-block"></span>
+            {tag ? `#${tag}` : 'MEMBERS'} 
+            <span className="text-muted-foreground ml-2 text-sm font-normal font-mono">
+              [{alumniList.length} FOUND]
+            </span>
+          </h2>
+          
+          <AlumniCarousel 
+            alumniList={alumniList} 
+            searchParams={`q=${search}&tag=${tag}`}
+          />
+        </div>
       </main>
     </div>
   )

@@ -22,7 +22,7 @@ export default async function MyPage() {
   const allTags = await getTags()
 
   return (
-    <div className="container max-w-lg py-10 px-4">
+    <div className="container mx-auto max-w-lg py-10 px-4">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">내 정보 수정</CardTitle>
