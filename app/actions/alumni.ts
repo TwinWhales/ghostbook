@@ -67,6 +67,31 @@ export async function getAlumniList(search?: string, tag?: string) {
   })) as Alumni[]
 }
 
+export async function getAlumniById(id: string) {
+  const { data, error } = await supabase
+    .from('tb_alumni')
+    .select(`
+      *,
+      tb_alumni_tags (
+        tb_tags (
+          tag_name
+        )
+      )
+    `)
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    console.error('Error fetching alumni detail:', error)
+    return null
+  }
+
+  return {
+    ...data,
+    tags: data.tb_alumni_tags?.map((t: any) => t.tb_tags?.tag_name).filter(Boolean) || []
+  } as Alumni
+}
+
 export async function getTags() {
   const { data, error } = await supabase.from('tb_tags').select('tag_name').order('tag_name')
   if (error) return []

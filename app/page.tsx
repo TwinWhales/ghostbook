@@ -1,33 +1,36 @@
-
-import { getAlumniList, getTags } from '@/app/actions/alumni'
+import { getAlumniList, getTags, getAlumniById } from '@/app/actions/alumni'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge' // Need to ensure Badge exists or use custom
 import Link from 'next/link'
 import { Search } from 'lucide-react'
-
-// Badge component might not exist yet if I didn't install it. 
-// I'll assume standard Tailwind or create a simple inline style if needed.
-// Checking previous steps: I only installed button, input, label, card.
-// I should probably install 'badge' or just style it manually.
-// Let's style manually for minimalism and speed if not present.
-// Actually, simple <span> with classes is enough.
+import { AlumniDetailWrapper } from '@/components/alumni-detail-wrapper'
 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; tag?: string }>
+  searchParams: Promise<{ q?: string; tag?: string; id?: string }>
 }) {
   const params = await searchParams;
   const search = params.q || ''
   const tag = params.tag || ''
-
+  const id = params.id
+    
   const alumniList = await getAlumniList(search, tag)
   const tags = await getTags()
 
+  // Fetch detail if ID is present
+  const selectedAlumni = id ? await getAlumniById(id) : null
+  
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
+      {/* Detail Modal/Drawer Wrapper */}
+      {selectedAlumni && (
+        <AlumniDetailWrapper alumni={selectedAlumni} />
+      )}
+      
+      {/* ... rest of UI ... */}
+
       {/* Header */}
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center px-4">
@@ -91,29 +94,31 @@ export default async function Home({
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {alumniList.map((alumni) => (
-              <Card key={alumni.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardHeader className="p-4 pb-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{alumni.name}</CardTitle>
-                      <CardDescription>{alumni.cohort}기 / {alumni.student_id}</CardDescription>
+              <Link key={alumni.id} href={`/?q=${search}&tag=${tag}&id=${alumni.id}`} scroll={false}>
+                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                  <CardHeader className="p-4 pb-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg">{alumni.name}</CardTitle>
+                        <CardDescription>{alumni.cohort}기 / {alumni.student_id}</CardDescription>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 pt-2 space-y-2">
-                  <div className="text-sm font-medium">
-                    {alumni.company_name || '소속 없음'} 
-                    {alumni.job_title && <span className="text-muted-foreground font-normal"> | {alumni.job_title}</span>}
-                  </div>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {alumni.tags.map(t => (
-                      <span key={t} className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded">
-                        #{t}
-                      </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-2 space-y-2">
+                    <div className="text-sm font-medium">
+                      {alumni.company_name || '소속 없음'} 
+                      {alumni.job_title && <span className="text-muted-foreground font-normal"> | {alumni.job_title}</span>}
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {alumni.tags.map(t => (
+                        <span key={t} className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded">
+                          #{t}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         )}
