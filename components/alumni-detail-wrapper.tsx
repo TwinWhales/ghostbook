@@ -13,7 +13,7 @@ export function AlumniDetailWrapper({ alumni }: { alumni: Alumni }) {
     // Remove 'id' param but keep others (q, tag)
     const newParams = new URLSearchParams(searchParams.toString())
     newParams.delete('id')
-    router.push(`${pathname}?${newParams.toString()}`)
+    router.push(`${pathname}?${newParams.toString()}`, { scroll: false })
   }
 
   return (

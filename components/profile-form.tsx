@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { Alumni } from '@/app/actions/alumni'
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 
 interface ProfileFormProps {
   profile: Alumni
@@ -20,6 +20,7 @@ const initialState: ActionState = {
 
 export function ProfileForm({ profile, allTags }: ProfileFormProps) {
   const [state, formAction, isPending] = useActionState<ActionState, FormData>(updateProfile, initialState)
+  const [bioLength, setBioLength] = useState(profile.bio?.length || 0)
   const router = useRouter()
 
   useEffect(() => {
@@ -83,7 +84,7 @@ export function ProfileForm({ profile, allTags }: ProfileFormProps) {
       <div className="space-y-2">
         <div className="flex justify-between">
           <Label htmlFor="bio">자기소개</Label>
-          <span className="text-xs text-muted-foreground">최대 300자</span>
+          <span className="text-xs text-muted-foreground">{bioLength}/300자</span>
         </div>
         <textarea 
           id="bio" 
@@ -92,6 +93,7 @@ export function ProfileForm({ profile, allTags }: ProfileFormProps) {
           defaultValue={profile.bio || ''}
           placeholder="관심 분야나 멘토링 가능한 내용을 적어주세요."
           maxLength={300}
+          onChange={(e) => setBioLength(e.target.value.length)}
         />
       </div>
 

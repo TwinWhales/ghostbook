@@ -12,6 +12,7 @@ import LandingPage from '@/components/landing-page'
 import { AnimatedHeader } from '@/components/animated-header'
 import { AlumniCarousel } from '@/components/alumni-carousel'
 
+import { SearchForm } from '@/components/search-form'
 import { ScrollToTopButton } from '@/components/scroll-to-top-button'
 
 export const dynamic = 'force-dynamic'
@@ -112,17 +113,7 @@ export default async function Home({
         {/* Search & Filter Section */}
         <div className="mb-10 space-y-4">
           <div className="w-full md:w-1/2 mx-auto">
-             <form className="relative">
-               <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-               <Input
-                 type="search"
-                 placeholder="이름, 회사, 직무 검색..."
-                 className="pl-10 h-11 text-lg"
-                 name="q"
-                 defaultValue={search}
-               />
-               {tag && <input type="hidden" name="tag" value={tag} />}
-             </form>
+             <SearchForm />
           </div>
           
           <div className="flex flex-wrap justify-center gap-2">

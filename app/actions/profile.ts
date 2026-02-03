@@ -64,13 +64,18 @@ export async function updateProfile(prevState: ActionState, formData: FormData):
   if (job_title && job_title.length > 50) return { error: '직무명은 50자를 초과할 수 없습니다.' }
   if (bio && bio.length > 300) return { error: '자기소개는 300자를 초과할 수 없습니다.' }
   
-  // URL Validation (Simple "starts with http" check to prevent javascript: or malicious schemes)
+  // URL Validation
   const validateUrl = (url: string) => {
     if (!url) return null
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       return 'URL은 http:// 또는 https://로 시작해야 합니다.'
     }
-    return null
+    try {
+      new URL(url)
+      return null
+    } catch (e) {
+      return '유효하지 않은 URL 형식입니다.'
+    }
   }
 
   const linkedinError = validateUrl(linkedin_url)

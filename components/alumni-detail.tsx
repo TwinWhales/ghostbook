@@ -91,14 +91,18 @@ export function AlumniDetail({
 
          <div className="flex gap-2">
             {alumni.linkedin_url && (
-               <Button className="flex-1" variant="outline" onClick={() => window.open(alumni.linkedin_url!, '_blank')}>
-                 <Linkedin className="mr-2 h-4 w-4" /> LinkedIn
-               </Button>
+               <a href={alumni.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex-1">
+                 <Button className="w-full" variant="outline">
+                   <Linkedin className="mr-2 h-4 w-4" /> LinkedIn
+                 </Button>
+               </a>
             )}
             {alumni.blog_url && (
-               <Button className="flex-1" variant="outline" onClick={() => window.open(alumni.blog_url!, '_blank')}>
-                 <LinkIcon className="mr-2 h-4 w-4" /> Link/Blog
-               </Button>
+               <a href={alumni.blog_url} target="_blank" rel="noopener noreferrer" className="flex-1">
+                 <Button className="w-full" variant="outline">
+                   <LinkIcon className="mr-2 h-4 w-4" /> Link/Blog
+                 </Button>
+               </a>
             )}
          </div>
       </div>
