@@ -1,6 +1,6 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase'
 
 export type Alumni = {
   id: string
@@ -17,6 +17,7 @@ export type Alumni = {
 }
 
 export async function getAlumniList(search?: string, tag?: string) {
+  const supabase = await createClient()
   let query = supabase
     .from('tb_alumni')
     .select(`
@@ -68,6 +69,7 @@ export async function getAlumniList(search?: string, tag?: string) {
 }
 
 export async function getAlumniById(id: string) {
+  const supabase = await createClient()
   const { data, error } = await supabase
     .from('tb_alumni')
     .select(`
@@ -93,7 +95,8 @@ export async function getAlumniById(id: string) {
 }
 
 export async function getTags() {
+  const supabase = await createClient()
   const { data, error } = await supabase.from('tb_tags').select('tag_name').order('tag_name')
   if (error) return []
-  return data.map((d) => d.tag_name)
+  return data.map((d: { tag_name: string }) => d.tag_name)
 }

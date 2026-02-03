@@ -1,26 +1,45 @@
 
 import { loginWithGoogle } from '@/app/actions/auth'
+import { createClient } from '@/lib/supabase'
+import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import Link from 'next/link'
-import { checkAuthAndRedirect } from '@/lib/auth-check'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-export default async function LoginPage() {
-  await checkAuthAndRedirect()
+export default async function OnboardingAuthPage() {
+  // 1. Check Auth Status
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
+    // Check Profile Status
+    const { data: profile } = await supabase
+       .from('tb_alumni')
+       .select('student_id')
+       .eq('id', user.id)
+       .single()
+    
+    // 2. Routing Logic
+    if (profile && profile.student_id) {
+       redirect('/')
+    } else {
+       redirect('/register')
+    }
+  }
+
+  // 3. Not Logged In -> Show Google Login
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/40 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">로그인</CardTitle>
+          <CardTitle className="text-2xl font-bold">로그인 / 회원가입</CardTitle>
           <CardDescription>
-             구글 계정으로 간편하게 로그인하세요.
+             Google 계정으로 시작하세요.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form action={loginWithGoogle}>
             <Button type="submit" variant="outline" className="w-full flex gap-2">
-              {/* Simple Google Icon SVG */}
-              <svg className="h-5 w-5" viewBox="0 0 24 24">
+               <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"
@@ -38,15 +57,10 @@ export default async function LoginPage() {
                   fill="#EA4335"
                 />
               </svg>
-              Google 계정으로 로그인
+              Google 계정으로 계속하기
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
-            아직 계정이 없으신가요? <Link href="/signup" className="text-primary hover:underline">회원가입</Link>
-          </p>
-        </CardFooter>
       </Card>
     </div>
   )
