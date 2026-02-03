@@ -10,7 +10,7 @@
 - **Frontend:** Next.js 14+ (App Router), React, Tailwind CSS
 - **UI Library:** Shadcn/ui (추천), Lucide React (Icons)
 - **Backend:** Next.js Server Actions (또는 API Routes)
-- **Database:** Oracle Database (Free Tier 호환)
+- **Database:** Supabase (PostgreSQL)
 - **Deployment:** Vercel (예정)
 
 ## 3. 데이터베이스 스키마 (Oracle SQL)
