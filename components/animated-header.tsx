@@ -57,16 +57,43 @@ export function AnimatedHeader() {
     }
   }, [])
 
+  const handleScroll = () => {
+    const mainContent = document.getElementById('main-content')
+    if (mainContent) {
+      mainContent.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
-    <div className="text-center py-10 md:py-20">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] text-center pb-20">
       <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight font-mono">
-        <span className="text-muted-foreground">root@localhost:~# </span>
-        <span className="text-primary">{text}</span>
-        <span className="animate-pulse">_</span>
+        <span className="text-gray-400">root@localhost:~# </span>
+        <span className="text-green-500">{text}</span>
+        <span className="animate-pulse text-green-500">_</span>
       </h1>
-      <p className="mt-4 text-xl text-muted-foreground">
-        Hidden Network for Alumni
+      <p className="mt-4 text-xl text-gray-400 font-mono">
+        $ sudo connect ob --target=yb
       </p>
+      <div 
+        onClick={handleScroll}
+        className="absolute bottom-10 animate-bounce cursor-pointer p-2 hover:text-gray-300 transition-colors"
+        aria-label="Scroll down"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className="text-gray-500"
+        >
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
+      </div>
     </div>
   )
 }

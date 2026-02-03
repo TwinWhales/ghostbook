@@ -4,12 +4,15 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 import Link from 'next/link'
 import { Search } from 'lucide-react'
+import { Ghost } from 'lucide-react'
 import { AlumniDetailWrapper } from '@/components/alumni-detail-wrapper'
 
 import { createClient } from '@/lib/supabase'
 import LandingPage from '@/components/landing-page'
 import { AnimatedHeader } from '@/components/animated-header'
 import { AlumniCarousel } from '@/components/alumni-carousel'
+
+import { ScrollToTopButton } from '@/components/scroll-to-top-button'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +28,7 @@ export default async function Home({
   if (!user) {
     const { redirect } = await import('next/navigation')
     redirect('/onboarding')
+    return null
   }
 
   // 2. Fetch User Profile to check status and missing fields
@@ -73,28 +77,14 @@ export default async function Home({
       {/* ... rest of UI ... */}
 
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-14 items-center px-4">
+      <header className="z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto flex h-14 items-center justify-between px-4">
           <div className="mr-4 hidden md:flex">
             <Link href="/" className="mr-6 flex items-center space-x-2">
-              <span className="hidden font-bold sm:inline-block">GHOST Archive</span>
+              <Ghost className="h-6 w-6" />
+              <span className="hidden font-bold sm:inline-block">GHOST Book</span>
             </Link>
           </div>
-          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-            <div className="w-full flex-1 md:w-auto md:flex-none">
-               {/* Search Form */}
-               <form className="relative">
-                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                 <Input
-                   type="search"
-                   placeholder="이름, 회사, 직무 검색..."
-                   className="pl-8 h-9 md:w-[300px] lg:w-[400px]"
-                   name="q"
-                   defaultValue={search}
-                 />
-                 {tag && <input type="hidden" name="tag" value={tag} />}
-               </form>
-            </div>
             <nav className="flex items-center space-x-2">
               <Link href="/mypage">
                 <Button variant="ghost" size="sm">내 정보</Button>
@@ -107,30 +97,49 @@ export default async function Home({
                 <Button variant="ghost" size="sm">로그아웃</Button>
               </form>
             </nav>
-          </div>
         </div>
-        
-        {/* Mobile Tag Filter (Horizontal Scroll) */}
-        <div className="container mx-auto px-4 py-2 overflow-x-auto whitespace-nowrap scrollbar-hide border-b md:border-none">
-          <div className="flex space-x-2">
-             <Link href="/">
-               <span className={`px-3 py-1 text-sm rounded-full cursor-pointer transition-colors ${!tag ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
+      </header>
+      
+
+      
+      <div className="w-full bg-neutral-950 text-white border-b border-neutral-800">
+        <div className="container mx-auto">
+           <AnimatedHeader />
+        </div>
+      </div>
+
+      <main id="main-content" className="container mx-auto px-4 py-8 overflow-hidden min-h-screen flex flex-col">
+        {/* Search & Filter Section */}
+        <div className="mb-10 space-y-4">
+          <div className="w-full md:w-1/2 mx-auto">
+             <form className="relative">
+               <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+               <Input
+                 type="search"
+                 placeholder="이름, 회사, 직무 검색..."
+                 className="pl-10 h-11 text-lg"
+                 name="q"
+                 defaultValue={search}
+               />
+               {tag && <input type="hidden" name="tag" value={tag} />}
+             </form>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-2">
+             <Link href="/" scroll={false}>
+               <span className={`px-4 py-2 text-sm rounded-full cursor-pointer transition-colors ${!tag ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
                  전체
                </span>
              </Link>
              {tags.map((t) => (
-               <Link key={t} href={`/?q=${search}&tag=${t}`}>
-                 <span className={`px-3 py-1 text-sm rounded-full cursor-pointer transition-colors ${tag === t ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
+               <Link key={t} href={`/?q=${search}&tag=${t}`} scroll={false}>
+                 <span className={`px-4 py-2 text-sm rounded-full cursor-pointer transition-colors ${tag === t ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
                    {t}
                  </span>
                </Link>
              ))}
           </div>
         </div>
-      </header>
-      
-      <main className="container mx-auto px-4 py-6 md:py-8 overflow-hidden">
-        <AnimatedHeader />
         
         <div className="mb-8">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -145,6 +154,11 @@ export default async function Home({
             alumniList={alumniList} 
             searchParams={`q=${search}&tag=${tag}`}
           />
+        </div>
+
+        {/* Scroll To Top Button */}
+        <div className="flex justify-center pb-10 mt-auto">
+           <ScrollToTopButton />
         </div>
       </main>
     </div>

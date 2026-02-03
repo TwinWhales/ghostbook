@@ -50,24 +50,47 @@ export async function updateProfile(formData: FormData) {
   const linkedin_url = formData.get('linkedin_url') as string
   const blog_url = formData.get('blog_url') as string
   
-  // Tags are a bit complex from standard FormData if invalid multiple selects.
-  // Assuming we use standard <select multiple> or a hidden input with comma separated values?
-  // Let's assume frontend sends 'tags' as comma separated string or multiple entries.
-  // FormData.getAll('tags') gives array of strings.
+  // New Fields
+  const ob_yb = formData.get('ob_yb') as string
+  const cohort = formData.get('cohort') as string
+
+  // Validation
+  if (company_name && company_name.length > 50) return { error: '회사명은 50자를 초과할 수 없습니다.' }
+  if (job_title && job_title.length > 50) return { error: '직무명은 50자를 초과할 수 없습니다.' }
+  if (bio && bio.length > 300) return { error: '자기소개는 300자를 초과할 수 없습니다.' }
+  
+  // URL Validation (Simple "starts with http" check to prevent javascript: or malicious schemes)
+  const validateUrl = (url: string) => {
+    if (!url) return null
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return 'URL은 http:// 또는 https://로 시작해야 합니다.'
+    }
+    return null
+  }
+
+  const linkedinError = validateUrl(linkedin_url)
+  if (linkedinError) return { error: `LinkedIn ${linkedinError}` }
+  
+  const blogError = validateUrl(blog_url)
+  if (blogError) return { error: `블로그 ${blogError}` }
+
+  // OB/YB Cohort Validation
+  if (ob_yb && !['OB', 'YB'].includes(ob_yb)) return { error: 'OB 또는 YB만 선택 가능합니다.' }
+  if (cohort && isNaN(parseInt(cohort))) return { error: '기수는 숫자여야 합니다.' }
+
   const tags = formData.getAll('tags') as string[] 
-  // If we decide to use a simpler "comma separated string" input for MVP:
-  // const tagsString = formData.get('tags') as string
-  // const tags = tagsString.split(',').map(t => t.trim()).filter(Boolean)
 
   // 1. Update TB_ALUMNI
   const { error: updateError } = await supabase
     .from('tb_alumni')
     .update({
-      company_name,
-      job_title,
-      bio,
-      linkedin_url,
-      blog_url,
+      company_name: company_name || null,
+      job_title: job_title || null,
+      bio: bio || null,
+      linkedin_url: linkedin_url || null,
+      blog_url: blog_url || null,
+      ob_yb: ob_yb || 'OB', // Default to OB if missing, but UI should force it
+      cohort: cohort ? parseInt(cohort) : null,
       last_updated: new Date().toISOString()
     })
     .eq('id', user.id)

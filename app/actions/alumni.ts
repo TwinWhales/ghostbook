@@ -13,6 +13,7 @@ export type Alumni = {
   linkedin_url: string | null
   blog_url: string | null
   bio: string | null
+  ob_yb: 'OB' | 'YB' | null
   tags: string[]
 }
 
