@@ -1,65 +1,123 @@
-import Image from "next/image";
 
-export default function Home() {
+import { getAlumniList, getTags } from '@/app/actions/alumni'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge' // Need to ensure Badge exists or use custom
+import Link from 'next/link'
+import { Search } from 'lucide-react'
+
+// Badge component might not exist yet if I didn't install it. 
+// I'll assume standard Tailwind or create a simple inline style if needed.
+// Checking previous steps: I only installed button, input, label, card.
+// I should probably install 'badge' or just style it manually.
+// Let's style manually for minimalism and speed if not present.
+// Actually, simple <span> with classes is enough.
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; tag?: string }>
+}) {
+  const params = await searchParams;
+  const search = params.q || ''
+  const tag = params.tag || ''
+
+  const alumniList = await getAlumniList(search, tag)
+  const tags = await getTags()
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center px-4">
+          <div className="mr-4 hidden md:flex">
+            <Link href="/" className="mr-6 flex items-center space-x-2">
+              <span className="hidden font-bold sm:inline-block">GHOSTd</span>
+            </Link>
+          </div>
+          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+            <div className="w-full flex-1 md:w-auto md:flex-none">
+               {/* Search Form */}
+               <form className="relative">
+                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                 <Input
+                   type="search"
+                   placeholder="이름, 회사, 직무 검색..."
+                   className="pl-8 h-9 md:w-[300px] lg:w-[400px]"
+                   name="q"
+                   defaultValue={search}
+                 />
+                 {tag && <input type="hidden" name="tag" value={tag} />}
+               </form>
+            </div>
+            <nav className="flex items-center space-x-2">
+              <Link href="/login">
+                <Button variant="ghost" size="sm">로그인</Button>
+              </Link>
+            </nav>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        
+        {/* Mobile Tag Filter (Horizontal Scroll) */}
+        <div className="container px-4 py-2 overflow-x-auto whitespace-nowrap scrollbar-hide border-b md:border-none">
+          <div className="flex space-x-2">
+             <Link href="/">
+               <span className={`px-3 py-1 text-sm rounded-full cursor-pointer transition-colors ${!tag ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
+                 전체
+               </span>
+             </Link>
+             {tags.map((t) => (
+               <Link key={t} href={`/?q=${search}&tag=${t}`}>
+                 <span className={`px-3 py-1 text-sm rounded-full cursor-pointer transition-colors ${tag === t ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}>
+                   {t}
+                 </span>
+               </Link>
+             ))}
+          </div>
         </div>
+      </header>
+
+      <main className="container px-4 py-6 md:py-8">
+        <h2 className="text-xl font-semibold mb-4">
+          {tag ? `#${tag}` : '전체 졸업생'} 
+          <span className="text-muted-foreground ml-2 text-sm font-normal">({alumniList.length})</span>
+        </h2>
+
+        {alumniList.length === 0 ? (
+           <div className="text-center py-20 text-muted-foreground">
+             검색 결과가 없습니다.
+           </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {alumniList.map((alumni) => (
+              <Card key={alumni.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="p-4 pb-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="text-lg">{alumni.name}</CardTitle>
+                      <CardDescription>{alumni.cohort}기 / {alumni.student_id}</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-2 space-y-2">
+                  <div className="text-sm font-medium">
+                    {alumni.company_name || '소속 없음'} 
+                    {alumni.job_title && <span className="text-muted-foreground font-normal"> | {alumni.job_title}</span>}
+                  </div>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {alumni.tags.map(t => (
+                      <span key={t} className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded">
+                        #{t}
+                      </span>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </main>
     </div>
-  );
+  )
 }
