@@ -4,42 +4,36 @@ import { updateProfile } from '@/app/actions/profile'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Alumni } from '@/app/actions/alumni'
+import { useActionState, useEffect } from 'react'
 
 interface ProfileFormProps {
   profile: Alumni
   allTags: string[]
 }
 
+const initialState = {
+  error: '',
+  success: false
+}
+
 export function ProfileForm({ profile, allTags }: ProfileFormProps) {
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [state, formAction, isPending] = useActionState(updateProfile, initialState)
   const router = useRouter()
 
-  const handleSubmit = async (formData: FormData) => {
-    setLoading(true)
-    setError(null)
-
-    const result = await updateProfile(formData)
-    
-    setLoading(false)
-    if (result?.error) {
-      setError(result.error)
-    } else {
-      // Success - maybe show toast or redirect?
-      // Server action already revalidates.
+  useEffect(() => {
+    if (state?.success) {
       alert('저장되었습니다.')
       router.refresh()
     }
-  }
+  }, [state?.success, router])
 
   return (
-    <form action={handleSubmit} className="space-y-6">
-      {error && (
+    <form action={formAction} className="space-y-6">
+      {state?.error && (
         <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md font-medium">
-          {error}
+          {state.error}
         </div>
       )}
 
@@ -134,8 +128,8 @@ export function ProfileForm({ profile, allTags }: ProfileFormProps) {
         <p className="text-xs text-muted-foreground">여러 개 선택 가능합니다.</p>
       </div>
 
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? '저장 중...' : '저장하기'}
+      <Button type="submit" className="w-full" disabled={isPending}>
+        {isPending ? '저장 중...' : '저장하기'}
       </Button>
     </form>
   )
